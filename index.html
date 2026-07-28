@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA FC Manager</title>
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'fifa-blue': '#0084FF',
+                        'fifa-green': '#00FF88',
+                        'fifa-orange': '#FF8800',
+                        'fifa-dark': '#1a1a2e',
+                        'fifa-darker': '#16213e',
+                        'fifa-red': '#FF4444'
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        body{
+            background-color: rgb(5, 42, 85);
+        }
+
+        .bg-fifa-blue { background-color: #0084FF !important; }
+        .bg-fifa-green { background-color: #00FF88 !important; }
+        .bg-fifa-orange { background-color: #FF8800 !important; }
+        .bg-fifa-dark { background-color: #1a1a2e !important; }
+        .bg-fifa-darker { background-color: #16213e !important; }
+        .bg-fifa-red { background-color: #FF4444 !important; }
+
+        .bg-fifa-blue\/80 { background-color: rgba(0, 132, 255, 0.8) !important; }
+        .bg-fifa-blue\/20 { background-color: rgba(0, 132, 255, 0.2) !important; }
+        .bg-fifa-green\/80 { background-color: rgba(0, 255, 136, 0.8) !important; }
+        .bg-fifa-green\/10 { background-color: rgba(0, 255, 136, 0.1) !important; }
+        .bg-fifa-orange\/80 { background-color: rgba(255, 136, 0, 0.8) !important; }
+        .bg-fifa-dark\/50 { background-color: rgba(26, 26, 46, 0.5) !important; }
+        .bg-fifa-dark\/30 { background-color: rgba(26, 26, 46, 0.3) !important; }
+        .bg-fifa-dark\/70 { background-color: rgba(26, 26, 46, 0.7) !important; }
+        .bg-fifa-darker\/50 { background-color: rgba(22, 33, 62, 0.5) !important; }
+        .bg-fifa-darker\/30 { background-color: rgba(22, 33, 62, 0.3) !important; }
+        .bg-fifa-darker\/20 { background-color: rgba(22, 33, 62, 0.2) !important; }
+
+        .text-fifa-blue { color: #0084FF !important; }
+        .text-fifa-green { color: #00FF88 !important; }
+        .text-fifa-orange { color: #FF8800 !important; }
+        .text-fifa-dark { color: #1a1a2e !important; }
+        .text-fifa-darker { color: #16213e !important; }
+        .text-fifa-red { color: #FF4444 !important; }
+
+        .border-fifa-blue { border-color: #0084FF !important; }
+        .border-fifa-green { border-color: #00FF88 !important; }
+        .border-fifa-orange { border-color: #FF8800 !important; }
+        .border-fifa-dark { border-color: #1a1a2e !important; }
+        .border-fifa-darker { border-color: #16213e !important; }
+        .border-fifa-red { border-color: #FF4444 !important; }
+        .border-fifa-blue\/30 { border-color: rgba(0, 132, 255, 0.3) !important; }
+        .border-fifa-blue\/20 { border-color: rgba(0, 132, 255, 0.2) !important; }
+        .border-fifa-green\/30 { border-color: rgba(0, 255, 136, 0.3) !important; }
+        .border-fifa-orange\/50 { border-color: rgba(255, 136, 0, 0.5) !important; }
+        .accordion-content {
+            max-height: 0;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .accordion-content:not(.hidden) {
+            max-height: 1000px;
+        }
+
+        .bet-btn.selected {
+            border-color: #FF8800 !important;
+            background-color: rgba(255, 136, 0, 0.18) !important;
+        }
+
+        /* Container %20 genişlik hissi için */
+        .container {
+            max-width: 90% !important;
+        }
+    </style>
+
+</head>
+
+<body class="bg-fifa-darker text-white min-h-screen">
+    <!-- Header -->
+    <header class="bg-fifa-dark border-b border-fifa-blue/30 py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-trophy text-fifa-orange text-2xl"></i>
+                    <h1 class="text-2xl font-bold text-white">FIFA FC Manager</h1>
+                </div>
+                <button id="addPlayerBtn"
+                    class="bg-fifa-blue hover:bg-fifa-blue/80 text-white px-6 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2">
+                    <i class="fas fa-plus"></i>
+                    <span>Oyuncu Ekle</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-2 md:px-4 py-8">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-fifa-dark/50 backdrop-blur-sm border border-fifa-blue/20 rounded-xl p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm">Toplam Oyuncu</p>
+                        <p id="totalPlayers" class="text-3xl font-bold text-fifa-blue">0</p>
+                    </div>
+                    <i class="fas fa-users text-fifa-blue text-2xl"></i>
+                </div>
+            </div>
+            <div class="bg-fifa-dark/50 backdrop-blur-sm border border-fifa-blue/20 rounded-xl p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm">Toplam Bakiye</p>
+                        <p id="totalBalance" class="text-3xl font-bold text-fifa-green">₺0</p>
+                    </div>
+                    <i class="fas fa-wallet text-fifa-green text-2xl"></i>
+                </div>
+            </div>
+            <div class="bg-fifa-dark/50 backdrop-blur-sm border border-fifa-blue/20 rounded-xl p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm">Aktif Takım</p>
+                        <p id="activeTeams" class="text-3xl font-bold text-fifa-orange">0</p>
+                    </div>
+                    <i class="fas fa-shield-alt text-fifa-orange text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Players Grid -->
+        <div id="playersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Players will be dynamically added here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-16 hidden">
+            <i class="fas fa-users-slash text-6xl text-gray-600 mb-4"></i>
+            <h3 class="text-2xl font-bold text-gray-400 mb-2">Henüz oyuncu yok</h3>
+            <p class="text-gray-500 mb-6">İlk oyuncunuzu ekleyerek başlayın</p>
+            <button id="addFirstPlayer"
+                class="bg-fifa-blue hover:bg-fifa-blue/80 text-white px-8 py-3 rounded-lg transition-all duration-300">
+                <i class="fas fa-plus mr-2"></i>
+                Oyuncu Ekle
+            </button>
+        </div>
+    </main>
+
+    <!-- Süper Lig Section -->
+    <section class="container mx-auto px-4 py-8">
+        <div class="bg-fifa-dark/50 backdrop-blur-sm border border-fifa-blue/30 rounded-2xl p-6">
+            <!-- Başlık -->
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold text-white mb-2">
+                    <i class="fas fa-trophy text-yellow-400 mr-3"></i>
+                    Süper Lig
+                </h2>
+                <p class="text-gray-400 text-lg">Puan Durumu</p>
+            </div>
+
+            <!-- Puan Tablosu -->
+            <div class="bg-fifa-darker rounded-xl shadow-2xl overflow-hidden mb-8">
+                <div class="overflow-x-auto">
+                    <table id="standingsTable" class="min-w-[1100px] w-full text-gray-300 tabular-nums">
+                        <thead
+                            class="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold text-xs md:text-sm">
+                            <tr>
+                                <th class="px-4 py-2 text-center">#</th>
+                                <th class="px-4 py-2 text-left">TAKIM</th>
+                                <th class="px-2 py-2 text-right">O</th>
+                                <th class="px-2 py-2 text-right">G</th>
+                                <th class="px-2 py-2 text-right">B</th>
+                                <th class="px-2 py-2 text-right">M</th>
+                                <th class="px-2 py-2 text-right">A</th>
+                                <th class="px-2 py-2 text-right">AG</th>
+                                <th class="px-2 py-2 text-right">YG</th>
+                                <th class="px-2 py-2 text-right">P</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leagueStandingsTable" class="divide-y divide-gray-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Şampiyon Kutlaması -->
+            <div id="championSection" class="mb-8" style="display: none;">
+                <div
+                    class="bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-500 rounded-2xl p-8 shadow-2xl text-center relative overflow-hidden">
+                    <div class="relative z-10">
+                        <div class="text-6xl mb-4">🏆</div>
+                        <h2 class="text-4xl font-bold text-gray-900 mb-2">ŞAMPİYON!</h2>
+                        <div class="flex items-center justify-center gap-4 my-6">
+                            <img id="championLogo" src="" class="w-24 h-24 object-contain">
+                            <div class="text-left">
+                                <h3 id="championName" class="text-5xl font-bold text-gray-900"></h3>
+                                <p id="championStats" class="text-xl text-gray-800 mt-2"></p>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <button id="restartSeasonBtn"
+                                class="bg-gray-900 hover:bg-gray-800 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
+                                <i class="fas fa-redo mr-2"></i>
+                                Sezonu Yeniden Başlat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fikstür Bölümü -->
+            <div>
+                <!-- Başlık ve Buton -->
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-white">
+                        <i class="fas fa-calendar-alt text-purple-400 mr-3"></i>
+                        Fikstür
+                    </h2>
+                    <div class="flex items-center gap-3">
+                        <button id="startSeasonBtn"
+                            class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-play mr-2"></i>
+                            Sezonu Başlat
+                        </button>
+                        <button id="restartSeasonBtnTop"
+                            class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300">
+                            <i class="fas fa-redo mr-2"></i>
+                            Sezonu Yeniden Başlat
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hafta Seçimi -->
+                <div class="mb-6" id="weekSelector" style="display: none;">
+                    <label class="text-white text-lg mb-2 block">
+                        <i class="fas fa-calendar-week mr-2"></i>
+                        Hafta Seçin:
+                    </label>
+                    <div class="flex gap-4">
+                        <select id="weekSelect"
+                            class="flex-1 bg-fifa-darker text-white border-2 border-purple-600 rounded-lg px-4 py-3 text-lg focus:outline-none focus:border-blue-500 transition-colors">
+                            <option value="">Hafta seçiniz...</option>
+                        </select>
+                        <button id="playWeekBtn"
+                            class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+                            style="display: none;">
+                            <i class="fas fa-play-circle mr-2"></i>
+                            Haftayı Oyna
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Maçlar -->
+                <div id="matchesContainer" class="space-y-4">
+                    <div class="text-center text-gray-400 py-8">
+                        <i class="fas fa-info-circle text-4xl mb-3"></i>
+                        <p class="text-lg">Sezonu başlatmak için yukarıdaki butona tıklayın</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Açıklamalar -->
+            <div class="mt-8 bg-fifa-darker rounded-xl p-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-400">O:</span>
+                        <span class="text-white">Oynanan</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-400">G:</span>
+                        <span class="text-white">Galibiyet</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-400">B:</span>
+                        <span class="text-white">Beraberlik</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-400">M:</span>
+                        <span class="text-white">Mağlubiyet</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-400">A:</span>
+                        <span class="text-white">Averaj</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-400">P:</span>
+                        <span class="text-white">Puan</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Manuel Skor Girişi Modal -->
+    <div id="manualScoreModal" class="fixed inset-0 bg-black bg-opacity-75 items-center justify-center z-50"
+        style="display: none;">
+        <div class="bg-fifa-darker rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-white">
+                    <i class="fas fa-edit mr-2"></i>
+                    Manuel Skor Gir
+                </h3>
+                <button id="closeModal" class="text-gray-400 hover:text-white text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <img id="modalHomeTeamLogo" src="" class="w-10 h-10 object-contain">
+                        <span id="modalHomeTeamName" class="text-white font-semibold"></span>
+                    </div>
+                    <span class="text-gray-400">VS</span>
+                    <div class="flex items-center gap-3 flex-row-reverse">
+                        <img id="modalAwayTeamLogo" src="" class="w-10 h-10 object-contain">
+                        <span id="modalAwayTeamName" class="text-white font-semibold"></span>
+                    </div>
+                </div>
+
+                <!-- İlk Yarı Skoru -->
+                <div class="mb-4">
+                    <label class="text-gray-300 text-sm mb-2 block">İlk Yarı Skoru</label>
+                    <div class="flex items-center justify-center gap-4">
+                        <input type="number" id="inputHomeHT" min="0" max="9" value="0"
+                            class="w-20 bg-fifa-dark text-white text-center text-2xl font-bold rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600">
+                        <span class="text-white text-2xl font-bold">-</span>
+                        <input type="number" id="inputAwayHT" min="0" max="9" value="0"
+                            class="w-20 bg-fifa-dark text-white text-center text-2xl font-bold rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600">
+                    </div>
+                </div>
+
+                <!-- Maç Sonu Skoru -->
+                <div class="mb-6">
+                    <label class="text-gray-300 text-sm mb-2 block">Maç Sonu Skoru</label>
+                    <div class="flex items-center justify-center gap-4">
+                        <input type="number" id="inputHomeFT" min="0" max="9" value="0"
+                            class="w-20 bg-fifa-dark text-white text-center text-2xl font-bold rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600">
+                        <span class="text-white text-2xl font-bold">-</span>
+                        <input type="number" id="inputAwayFT" min="0" max="9" value="0"
+                            class="w-20 bg-fifa-dark text-white text-center text-2xl font-bold rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600">
+                    </div>
+                </div>
+
+                <button id="saveManualScore"
+                    class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 rounded-lg transition-all duration-300">
+                    <i class="fas fa-save mr-2"></i>
+                    Skoru Kaydet
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bank Modal -->
+    <div id="bankModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-fifa-dark border border-fifa-blue/30 rounded-2xl p-8 w-full max-w-lg mx-4 transform">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-university text-yellow-400 text-2xl"></i>
+                    <h2 class="text-2xl font-bold text-white">FIFA Bank</h2>
+                </div>
+                <button id="closeBankModal" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <div class="text-center">
+                    <img id="bankPlayerImage" src="content/images/player-placeholder.svg" alt="Player"
+                        class="w-20 h-20 rounded-full mx-auto mb-4 object-cover">
+                    <h3 id="bankPlayerName" class="text-xl font-bold text-white"></h3>
+                    <p id="bankPlayerTeam" class="text-gray-400"></p>
+                    <p class="text-2xl font-bold text-fifa-green mt-2">Mevcut Bakiye: ₺<span
+                            id="bankCurrentBalance">0</span></p>
+                </div>
+
+                <!-- Credit Info -->
+                <div class="bg-fifa-darker/50 rounded-lg p-4">
+                    <h4 class="text-lg font-bold text-white mb-3">Kredi Bilgileri</h4>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div class="text-center">
+                            <p class="text-gray-400">Mevcut Borç</p>
+                            <p id="currentDebt" class="text-xl font-bold text-fifa-red">₺0</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-gray-400">Kredi Limiti</p>
+                            <p id="bankCreditLimitDisplay" class="text-xl font-bold text-fifa-blue">₺200</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Take Credit -->
+                <div id="takeCreditSection" class="space-y-4">
+                    <h4 class="text-lg font-bold text-white">Kredi Çek</h4>
+                    <div class="flex items-center space-x-4">
+                        <input type="number" id="creditAmount" min="1" max="200" value="100" placeholder="Tutar"
+                            class="flex-1 bg-fifa-darker border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-fifa-blue focus:outline-none">
+                        <button onclick="calculateCredit()"
+                            class="bg-fifa-blue hover:bg-fifa-blue/80 text-white px-4 py-3 rounded-lg transition-colors">
+                            <i class="fas fa-calculator"></i>
+                        </button>
+                    </div>
+
+                    <!-- Credit Calculation -->
+                    <div id="creditCalculation" class="bg-fifa-darker/30 rounded-lg p-4 hidden">
+                        <h5 class="text-white font-bold mb-2">Kredi Detayları</h5>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Çekilecek Tutar:</span>
+                                <span id="creditPrincipal" class="text-white">₺0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span id="creditInterestLabel" class="text-gray-400">Faiz (%38):</span>
+                                <span id="creditInterest" class="text-fifa-orange">₺0</span>
+                            </div>
+                            <div class="flex justify-between border-t border-gray-600 pt-2">
+                                <span class="text-white font-bold">Toplam Geri Ödeme:</span>
+                                <span id="creditTotal" class="text-fifa-red font-bold">₺0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="takeCredit()" id="takeCreditBtn"
+                        class="w-full bg-fifa-green hover:bg-fifa-green/80 text-white py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled>
+                        <i class="fas fa-hand-holding-usd mr-2"></i>
+                        Kredi Çek
+                    </button>
+                </div>
+
+                <!-- Pay Credit -->
+                <div id="payCreditSection" class="space-y-4 hidden">
+                    <h4 class="text-lg font-bold text-white">Kredi Öde</h4>
+                    <div class="bg-fifa-darker/30 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-gray-400">Toplam Borç:</span>
+                            <span id="totalDebtAmount" class="text-xl font-bold text-fifa-red">₺0</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-gray-400">Ödeme Gücünüz:</span>
+                            <span id="paymentPower" class="text-xl font-bold text-fifa-green">₺0</span>
+                        </div>
+                        <button onclick="payCredit()"
+                            class="w-full bg-fifa-orange hover:bg-fifa-orange/80 text-white py-3 rounded-lg transition-colors">
+                            <i class="fas fa-credit-card mr-2"></i>
+                            Krediyi Kapat
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button type="button" id="cancelBankBtn"
+                        class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition-colors">
+                        İptal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kadro Modal -->
+    <div id="kadroModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div
+            class="bg-fifa-dark border border-fifa-blue/30 rounded-2xl p-8 w-full max-w-4xl mx-4 transform max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-users text-purple-400 text-2xl"></i>
+                    <h2 class="text-2xl font-bold text-white">Kadro Yönetimi</h2>
+                </div>
+                <button id="closeKadroModal" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-5">
+                <!-- Player Info -->
+                <div class="text-center">
+                    <img id="kadroPlayerImage" src="content/images/player-placeholder.svg" alt="Player"
+                        class="w-20 h-20 rounded-full mx-auto mb-4 object-cover">
+                    <h3 id="kadroPlayerName" class="text-xl font-bold text-white"></h3>
+                    <p id="kadroPlayerTeam" class="text-gray-400"></p>
+                    <p class="text-2xl font-bold text-fifa-green mt-2">Bakiye: ₺<span id="kadroCurrentBalance">0</span>
+                    </p>
+                </div>
+
+                <!-- Oyuncu Ekle — inline akordiyon panel -->
+                <div class="rounded-xl border border-fifa-green/30 overflow-hidden">
+                    <button id="toggleAddKadroForm" onclick="showAddKadroPlayerModal()"
+                        class="w-full flex items-center justify-between px-4 py-3 bg-fifa-darker/60 hover:bg-fifa-green/10 transition-colors text-white">
+                        <span class="flex items-center space-x-2 font-semibold">
+                            <i class="fas fa-user-plus text-fifa-green"></i>
+                            <span>Oyuncu Ekle</span>
+                        </span>
+                        <i id="addKadroFormArrow"
+                            class="fas fa-chevron-down text-gray-400 transition-transform duration-200"></i>
+                    </button>
+
+                    <div id="addKadroFormPanel"
+                        class="hidden border-t border-gray-700/40 px-4 pb-4 space-y-4 pt-4 bg-fifa-darker/20">
+                        <!-- Maaş kademeleri — JS tarafından doldurulur (config'den) -->
+                        <div id="salaryTiersTable" class="rounded-lg overflow-hidden border border-gray-700/50 text-xs">
+                        </div>
+
+                        <!-- Oyuncu İsmi -->
+                        <div>
+                            <label class="block text-white font-medium mb-1 text-sm">Oyuncu İsmi</label>
+                            <input type="text" id="kadroPlayerNameInput" placeholder="Oyuncu ismini girin"
+                                class="w-full bg-fifa-darker border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-fifa-green focus:outline-none text-sm">
+                        </div>
+
+                        <!-- Overall -->
+                        <div>
+                            <label class="block text-white font-medium mb-1 text-sm">Overall</label>
+                            <input type="number" id="kadroPlayerOverall" min="60" max="99" placeholder="60-99 arası"
+                                class="w-full bg-fifa-darker border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-fifa-green focus:outline-none text-sm">
+                        </div>
+
+                        <!-- Maliyet Hesaplaması -->
+                        <div id="kadroCostDisplay"
+                            class="bg-fifa-darker/50 rounded-lg p-3 hidden border border-fifa-orange/20">
+                            <h5 class="text-white font-bold mb-2 text-sm">Maliyet Hesaplaması</h5>
+                            <div class="space-y-1 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">Overall:</span>
+                                    <span id="costOverall" class="text-white">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">Maaş:</span>
+                                    <span id="costRate" class="text-fifa-orange">-</span>
+                                </div>
+                                <div class="flex justify-between border-t border-gray-600 pt-1 mt-1">
+                                    <span class="text-white font-bold">Toplam:</span>
+                                    <span id="costTotal" class="text-fifa-red font-bold">₺0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Butonlar -->
+                        <div class="flex space-x-3">
+                            <button type="button" id="cancelAddKadroBtn" onclick="hideAddKadroPlayerModal()"
+                                class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg transition-colors text-sm">
+                                İptal
+                            </button>
+                            <button onclick="addKadroPlayer()" id="addKadroPlayerBtn"
+                                class="flex-1 bg-fifa-green hover:bg-fifa-green/80 text-white py-2 rounded-lg transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                                disabled>
+                                <i class="fas fa-plus mr-1"></i>Ekle
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kadro Listesi -->
+                <div class="bg-fifa-darker/50 rounded-lg p-4">
+                    <h4 class="text-lg font-bold text-white mb-4">Kadro Listesi</h4>
+                    <div id="kadroList" class="space-y-2">
+                        <p class="text-gray-400 text-center">Henüz oyuncu eklenmemiş</p>
+                    </div>
+                </div>
+
+                <!-- Kapat -->
+                <div class="flex justify-center">
+                    <button type="button" id="cancelKadroBtn"
+                        class="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg transition-colors">
+                        Kapat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Removed betting UI -->
+
+    <!-- Removed betting UI: bet-goals -->
+
+    <!-- Removed betting UI: bet-half-goals -->
+
+    <!-- Removed betting UI: bet-goal-range -->
+
+    <!-- Removed betting UI: bet-both-score -->
+
+    <!-- Removed betting UI: bet-handicap -->
+    </div>
+    </div>
+    </div>
+
+    <!-- Salary Payment Modal (Non-closable) -->
+    <div id="salaryPaymentModal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-[60]">
+        <div class="bg-fifa-dark border border-fifa-red/50 rounded-2xl p-8 w-full max-w-2xl mx-4 transform">
+            <div class="text-center mb-6">
+                <div class="text-6xl mb-4">⚠️</div>
+                <h3 class="text-3xl font-bold text-fifa-red mb-2">Maaş Ödemesi Gerekli!</h3>
+                <p id="salaryPaymentPlayerName" class="text-xl text-white mb-2"></p>
+                <p id="salaryPaymentMessage" class="text-gray-300 mb-4"></p>
+                <div class="bg-fifa-darker rounded-lg p-4 mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-400">Toplam Maaş:</span>
+                        <span id="salaryPaymentTotal" class="text-2xl font-bold text-fifa-red">₺0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Mevcut Bakiye:</span>
+                        <span id="salaryPaymentBalance" class="text-xl font-bold text-fifa-green">₺0</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-700">
+                        <span class="text-gray-400">Eksik Tutar:</span>
+                        <span id="salaryPaymentDeficit" class="text-xl font-bold text-fifa-orange">₺0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h4 class="text-lg font-bold text-white mb-3">Çözüm Seçenekleri:</h4>
+                <button id="salaryPaymentCreditBtn"
+                    class="w-full bg-fifa-blue hover:bg-fifa-blue/80 text-white font-bold py-4 px-6 rounded-lg transition-colors flex items-center justify-center space-x-3">
+                    <i class="fas fa-university text-2xl"></i>
+                    <div class="text-left">
+                        <div class="text-lg">Bankadan Kredi Çek</div>
+                        <div class="text-sm text-gray-300">Gerekli miktarı bankadan çekin ve otomatik ödeme yapılsın
+                        </div>
+                    </div>
+                </button>
+                <button id="salaryPaymentSellBtn"
+                    class="w-full bg-fifa-orange hover:bg-fifa-orange/80 text-white font-bold py-4 px-6 rounded-lg transition-colors flex items-center justify-center space-x-3">
+                    <i class="fas fa-users text-2xl"></i>
+                    <div class="text-left">
+                        <div class="text-lg">Oyuncu Sat</div>
+                        <div class="text-sm text-gray-300">Kadronuzdaki oyuncuları satarak borcu kapatın</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Player Sale Modal for Salary Payment -->
+    <div id="salaryPlayerSaleModal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-[70]">
+        <div
+            class="bg-fifa-dark border border-fifa-orange/50 rounded-2xl p-8 w-full max-w-3xl mx-4 transform max-h-[90vh] overflow-y-auto">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-4">👥</div>
+                <h3 class="text-2xl font-bold text-fifa-orange mb-2">Oyuncu Satışı</h3>
+                <p id="salarySalePlayerName" class="text-lg text-white mb-2"></p>
+                <div class="bg-fifa-darker rounded-lg p-4 mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-400">Kalan Borç:</span>
+                        <span id="salarySaleRemainingDebt" class="text-2xl font-bold text-fifa-red">₺0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Mevcut Bakiye:</span>
+                        <span id="salarySaleBalance" class="text-xl font-bold text-fifa-green">₺0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h4 class="text-lg font-bold text-white mb-4">Kadro Listesi:</h4>
+                <div id="salarySaleKadroList" class="space-y-3">
+                    <p class="text-gray-400 text-center">Yükleniyor...</p>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button id="salarySaleCloseBtn"
+                    class="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg transition-colors"
+                    style="display: none;">
+                    <i class="fas fa-check mr-2"></i>
+                    Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div id="alertModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-fifa-dark border border-fifa-blue/30 rounded-2xl p-6 w-full max-w-md mx-4 transform">
+            <div class="text-center">
+                <div id="alertIcon" class="text-6xl mb-4">🎉</div>
+                <h3 id="alertTitle" class="text-2xl font-bold text-white mb-2">Başarılı!</h3>
+                <p id="alertMessage" class="text-gray-300 mb-6">İşlem tamamlandı.</p>
+                <button id="alertCloseBtn"
+                    class="bg-fifa-blue hover:bg-fifa-blue/80 text-white px-8 py-3 rounded-lg transition-colors">
+                    <i class="fas fa-check mr-2"></i>
+                    Tamam
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Log & Match History -->
+    <div class="bg-fifa-darker border-t border-fifa-blue/30 py-6 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Transaction Log -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+                            <i class="fas fa-history text-fifa-blue"></i>
+                            <span>İşlem Geçmişi</span>
+                        </h3>
+                        <button onclick="clearTransactionLog()"
+                            class="bg-fifa-red hover:bg-fifa-red/80 text-white px-4 py-2 rounded-lg transition-colors text-sm">
+                            <i class="fas fa-trash mr-2"></i>
+                            Temizle
+                        </button>
+                    </div>
+                    <div id="transactionLog" class="bg-fifa-dark rounded-lg p-4 max-h-96 overflow-y-auto">
+                        <p class="text-gray-400 text-center">Henüz işlem yapılmamış</p>
+                    </div>
+                </div>
+
+                <!-- Match History -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+                            <i class="fas fa-futbol text-fifa-orange"></i>
+                            <span>Maç Geçmişi</span>
+                        </h3>
+                        <button onclick="clearMatchHistory()"
+                            class="bg-fifa-red hover:bg-fifa-red/80 text-white px-4 py-2 rounded-lg transition-colors text-sm">
+                            <i class="fas fa-trash mr-2"></i>
+                            Temizle
+                        </button>
+                    </div>
+                    <div id="matchHistoryLog" class="bg-fifa-dark rounded-lg p-4 max-h-96 overflow-y-auto">
+                        <p class="text-gray-400 text-center">Henüz maç oynanmamış</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Betting Modal -->
+    <div id="betModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-fifa-dark border border-fifa-blue/30 rounded-2xl p-6 w-full max-w-4xl mx-4 transform">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-ticket-alt text-fifa-orange"></i>
+                    Bahis Bülteni
+                </h2>
+                <button id="closeBetModal" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div id="betAccordion" class="space-y-3 max-h-[60vh] overflow-y-auto">
+                <p class="text-gray-400 text-center">En yakın haftanın maçları burada listelenecek</p>
+            </div>
+            <div class="mt-4 border-t border-gray-700/50 pt-4">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="text-white font-bold">Kupon</div>
+                    <div id="betSlipType" class="text-sm text-fifa-orange">Tekli</div>
+                </div>
+                <div id="betSlipList" class="space-y-2 max-h-40 overflow-y-auto">
+                    <p class="text-gray-400 text-sm">Seçim yapın</p>
+                </div>
+                <div class="flex items-center justify-between mt-3">
+                    <div class="text-gray-300">Toplam Oran: <span id="betSlipTotal"
+                            class="text-fifa-green font-bold">1.00</span></div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-300">Tutar</span>
+                        <input id="betSlipAmount" type="number" min="1" value="10"
+                            class="w-24 bg-fifa-darker border border-gray-600 rounded px-2 py-1 text-white">
+                        <button id="confirmBetSlipBtn"
+                            class="bg-fifa-orange hover:bg-fifa-orange/80 text-white px-4 py-2 rounded">Onayla</button>
+                    </div>
+                </div>
+                <div class="mt-5">
+                    <div class="text-white font-bold mb-2">Onaylanan Kuponlar</div>
+                    <div id="betCouponsList" class="space-y-2 max-h-40 overflow-y-auto">
+                        <p class="text-gray-400 text-sm">Henüz kupon yok</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-fifa-dark border-t border-fifa-blue/30 py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm text-gray-400">
+                <div class="flex items-center justify-center space-x-2">
+                    <i class="fas fa-trophy text-fifa-orange"></i>
+                    <span>Galibiyet Ödülü: 5₺</span>
+                </div>
+                <div class="flex items-center justify-center space-x-2">
+                    <i class="fas fa-futbol text-fifa-green"></i>
+                    <span>Gol Primi: 4₺</span>
+                </div>
+                <div class="flex items-center justify-center space-x-2">
+                    <i class="fas fa-trophy text-yellow-400"></i>
+                    <span>Şampiyonluk Primi: 50₺</span>
+                </div>
+                <div class="flex items-center justify-center space-x-2">
+                    <i class="fas fa-calendar-alt text-fifa-blue"></i>
+                    <span>Lig: 5 Maç</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add Player Modal -->
+    <div id="playerModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-fifa-dark border border-fifa-blue/30 rounded-2xl p-8 w-full max-w-md mx-4 transform">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-white">Oyuncu Ekle</h2>
+                <button id="closeModal" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="playerForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Ad Soyad</label>
+                    <input type="text" id="fullName" required
+                        class="w-full bg-fifa-darker border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-fifa-blue focus:outline-none transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Nickname</label>
+                    <input type="text" id="nickname" required
+                        class="w-full bg-fifa-darker border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-fifa-blue focus:outline-none transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Takım</label>
+                    <input type="text" id="team" required
+                        class="w-full bg-fifa-darker border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-fifa-blue focus:outline-none transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Profil Resmi URL</label>
+                    <input type="url" id="profileImage"
+                        class="w-full bg-fifa-darker border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-fifa-blue focus:outline-none transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Başlangıç Bakiyesi</label>
+                    <input type="number" id="balance" value="0" min="0" step="0.01"
+                        class="w-full bg-fifa-darker border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-fifa-blue focus:outline-none transition-colors">
+                </div>
+
+                <div class="flex space-x-4">
+                    <button type="button" id="cancelBtn"
+                        class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition-colors">
+                        İptal
+                    </button>
+                    <button type="submit"
+                        class="flex-1 bg-fifa-blue hover:bg-fifa-blue/80 text-white py-3 rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-2"></i>
+                        Ekle
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Balance Modal -->
+    <div id="balanceModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-fifa-dark border border-fifa-blue/30 rounded-2xl p-8 w-full max-w-md mx-4 transform">
+            <div class="flex items-center justify-between mb-6">
+                <h2 id="balanceModalTitle" class="text-2xl font-bold text-white">Bakiye İşlemi</h2>
+                <button id="closeBalanceModal" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <div class="text-center">
+                    <img id="balancePlayerImage" src="content/images/player-placeholder.svg" alt="Player"
+                        class="w-20 h-20 rounded-full mx-auto mb-4 object-cover">
+                    <h3 id="balancePlayerName" class="text-xl font-bold text-white"></h3>
+                    <p id="balancePlayerTeam" class="text-gray-400"></p>
+                    <p class="text-2xl font-bold text-fifa-green mt-2">Mevcut Bakiye: ₺<span
+                            id="currentBalance">0</span></p>
+                </div>
+
+                <div id="amountInputDiv">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Tutar</label>
+                    <input type="number" id="balanceAmount" min="0" step="0.01" required
+                        class="w-full bg-fifa-darker border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-fifa-blue focus:outline-none transition-colors">
+                </div>
+
+                <div class="flex space-x-4">
+                    <button type="button" id="cancelBalanceBtn"
+                        class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition-colors">
+                        İptal
+                    </button>
+                    <button type="button" id="confirmBalanceBtn"
+                        class="flex-1 bg-fifa-green hover:bg-fifa-green/80 text-white py-3 rounded-lg transition-colors">
+                        <i class="fas fa-check mr-2"></i>
+                        Onayla
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slot Modal -->
+    <div id="slotModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-fifa-dark border border-fifa-blue/30 rounded-2xl p-8 w-full max-w-lg mx-4 transform">
+            <div class="flex items-center justify-between mb-6">
+                <h2 id="slotModalTitle" class="text-2xl font-bold text-white">Slot Makinesi</h2>
+                <button id="closeSlotModal" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <div class="text-center">
+                    <img id="slotPlayerImage" src="content/images/player-placeholder.svg" alt="Player"
+                        class="w-20 h-20 rounded-full mx-auto mb-4 object-cover">
+                    <h3 id="slotPlayerName" class="text-xl font-bold text-white"></h3>
+                    <p id="slotPlayerTeam" class="text-gray-400"></p>
+                    <p class="text-2xl font-bold text-fifa-green mt-2">Mevcut Bakiye: ₺<span
+                            id="slotCurrentBalance">0</span></p>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-gray-300 mb-2">Minimum bahis: 10₺</p>
+                    <div class="flex items-center justify-center space-x-4">
+                        <button onclick="changeSlotBetAmount(-5)"
+                            class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <span id="slotBetAmount" class="text-2xl font-bold text-white min-w-[80px]">10</span>
+                        <button onclick="changeSlotBetAmount(5)"
+                            class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Slot Machine -->
+                <div class="bg-fifa-darker border-4 border-fifa-blue/50 rounded-2xl p-6">
+                    <div class="flex justify-center space-x-2 mb-4">
+                        <div class="w-24 h-24 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center text-4xl font-bold overflow-hidden"
+                            id="slot1">
+                            <span class="slot-symbol">🍒</span>
+                        </div>
+                        <div class="w-24 h-24 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center text-4xl font-bold overflow-hidden"
+                            id="slot2">
+                            <span class="slot-symbol">🍋</span>
+                        </div>
+                        <div class="w-24 h-24 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center text-4xl font-bold overflow-hidden"
+                            id="slot3">
+                            <span class="slot-symbol">🍊</span>
+                        </div>
+                    </div>
+
+                    <!-- Pay Table -->
+                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-300 mt-4">
+                        <div class="bg-fifa-dark/50 p-2 rounded">
+                            <div class="font-bold text-fifa-green">3x Aynı = 2x</div>
+                            <div class="font-bold text-fifa-blue">2x Aynı = 1.5x</div>
+                        </div>
+                        <div class="bg-fifa-dark/50 p-2 rounded">
+                            <div class="font-bold text-fifa-orange">🍒🍒🍒 = 3x</div>
+                            <div class="font-bold text-fifa-red">🎰🎰🎰 = 5x</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="slotResult" class="text-center hidden">
+                    <p id="slotResultText" class="text-xl font-bold mb-2"></p>
+                    <p id="slotResultAmount" class="text-2xl font-bold"></p>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button type="button" id="cancelSlotBtn"
+                        class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition-colors">
+                        İptal
+                    </button>
+                    <button type="button" id="spinSlotBtn"
+                        class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg transition-colors">
+                        <i class="fas fa-play mr-2"></i>
+                        Çevir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="content/src/js/config.js"></script>
+    <script src="content/src/js/league.js"></script>
+    <script src="content/src/js/casino.js"></script>
+    <script src="content/src/js/bank.js"></script>
+    <script src="content/src/js/kadro.js"></script>
+    <script src="content/src/js/app-main.js"></script>
+</body>
+
+</html>
