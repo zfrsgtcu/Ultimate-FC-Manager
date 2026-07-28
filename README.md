@@ -1,5 +1,7 @@
 # ULTIMATE FIFA FC MANAGER CHALLANGER
 
+| (content/screenshots/banner.png) |
+
 ## Overview
 
 Ultimate Fifa FC Manager is a fun and interactive football management experience built as a browser-based web app. It is designed for FIFA lovers who want to enjoy a light, playful version of club management together with friends. Instead of being a heavy simulation platform, it focuses on the excitement of building a team, following a season, making financial decisions, and taking part in side activities such as betting and slot games.
