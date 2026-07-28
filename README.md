@@ -1,6 +1,6 @@
 # ULTIMATE FIFA FC MANAGER CHALLANGER
 
-| (content/screenshots/banner.png) |
+| ![ULTIMATE FIFA FC MANAGER CHALLANGER](content/screenshots/banner.png) |
 
 ## Overview
 
